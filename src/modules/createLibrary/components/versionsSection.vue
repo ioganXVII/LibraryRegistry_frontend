@@ -8,7 +8,7 @@
     </v-card-title>
     <v-card-text>
       <div
-        v-if="versions.length < 1"
+        v-if="checkVersionLength"
       >
         Version list empty
       </div>
@@ -17,9 +17,9 @@
       >
         <v-list-item
           v-for="(item, index) in versions"
-          :key="index"
+          :key="`versions - ${item.version}`"
           :title="item.version"
-          :subtitle="item.dependencies.length ? `Dependencies: ${item.dependencies.map((dep) => `${dep.name} - ${dep.version}`).join(', ')}` : ''"
+          :subtitle="getItemSubtitle(item)"
           @click="editVersion(item, index)"
         >
           <template #append>
@@ -28,7 +28,7 @@
               icon="mdi-delete"
               variant="text"
               @click="removeVersion(index)"
-            ></v-btn>
+            />
           </template>
         </v-list-item>
       </v-list>
@@ -55,7 +55,7 @@
             <v-container>
               <v-row>
                 <v-col cols="12">
-                  <v-text-field 
+                  <v-text-field
                     class="pt-2"
                     v-model="version"
                     label="Library version*"
@@ -90,10 +90,16 @@
                         class="pa-0"
                       >
                         <v-list-item
-                          v-for="(vers, versIndex) in item.versions"
-                          :key="versIndex"
+                          v-for="vers in item.versions"
+                          :key="`${item.name} ${vers.version}`"
                           class="pa-0"
-                          @click="addDependecie({ name: item.name, version: vers.version, dependencies: vers.dependencies })"
+                          @click="addDependecie(
+                            {
+                              name: item.name,
+                              version: vers.version,
+                              dependencies: vers.dependencies,
+                            },
+                          )"
                         >
                           {{ getVersionString(vers) }}
                         </v-list-item>
@@ -106,7 +112,7 @@
             <small>*indicates required field</small>
           </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
+            <v-spacer />
             <v-btn
               color="blue-darken-1"
               variant="text"
@@ -131,85 +137,92 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { useCreateLibraryStore } from '../../../stores/createLibrary'; 
 import { computed, ref } from 'vue';
+import { useCreateLibraryStore } from '../../../stores/createLibrary';
 
 const store = useCreateLibraryStore();
 
-const { dialog, version, versions, formValid, libraries, dependencies } = storeToRefs(store);
-let isEdit = ref(false);
+const {
+  dialog, version, versions, formValid, libraries, dependencies,
+} = storeToRefs(store);
+const isEdit = ref(false);
 let editIndex = null;
 
-
-const getDialogTitle = computed(() => isEdit.value ? 'Edit version' : 'Create version');
+const getDialogTitle = computed(() => (isEdit.value ? 'Edit version' : 'Create version'));
 const checkFormValid = computed(() => version.value && !formValid.value.version);
 
 function checkVersion() {
-    if (version.value === null || version.value === "") return true;
-    const test = /^\d\.\d$/gm.test(version.value);
-    formValid.value.version = test;
-    return test || 'Incorrect version';
+  if (version.value === null || version.value === '') return true;
+  const test = /^\d\.\d$/gm.test(version.value);
+  formValid.value.version = test;
+  return test || 'Incorrect version';
+}
+
+const checkVersionLength = computed(() => versions.length < 1);
+
+const getInactiveLibraries = computed(() => {
+  const filtredLibraries = [...libraries.value];
+  return filtredLibraries.filter((lib) => !dependencies.value.some((dep) => dep.name === lib.name));
+});
+
+function getItemSubtitle(item) {
+  return item.dependencies.length ? `Dependencies: ${item.dependencies.map((dep) => `${dep.name} - ${dep.version}`).join(', ')}` : '';
+}
+
+function closeDialog() {
+  dialog.value = false;
+  version.value = '';
+  dependencies.value = [];
+  if (isEdit.value) {
+    isEdit.value = false;
   }
+}
 
-  const getInactiveLibraries = computed(() => {
-    const filtredLibraries = [...libraries.value];
-    return filtredLibraries.filter((lib) => !dependencies.value.some((dep) => dep.name === lib.name));
-  });
+function addDependecie(item) {
+  dependencies.value.push(item);
+}
 
-  function closeDialog() {
+function deleteDependecie(index) {
+  dependencies.value.splice(index, 1);
+}
+
+function saveVersion() {
+  if (editIndex !== null) {
+    const editVers = versions.value[editIndex];
+    editVers.version = version.value;
+    editVers.dependencies = [...dependencies.value];
     dialog.value = false;
+  } else {
+    versions.value.push({ version: version.value, dependencies: [...dependencies.value] });
     version.value = '';
     dependencies.value = [];
-    if (isEdit.value) {
-      isEdit.value = false;
-    }
+    dialog.value = false;
   }
+}
 
-  function addDependecie(item) {
-    dependencies.value.push(item);
-  }
+function editVersion(editVers, index) {
+  isEdit.value = true;
+  editIndex = index;
+  version.value = editVers.version;
+  dependencies.value = [...editVers.dependencies];
+  dialog.value = true;
+}
 
-  function deleteDependecie(index) {
-    dependencies.value.splice(index, 1);
-  }
+function removeVersion(index) {
+  versions.value.splice(index, 1);
+}
 
-  function saveVersion() {
-    if (editIndex !== null) {
-      const editVersion = versions.value[editIndex];
-      editVersion.version = version.value;
-      editVersion.dependencies = [...dependencies.value];
-      dialog.value = false;
-    } else {
-      versions.value.push({ version: version.value, dependencies: [...dependencies.value] });
-      version.value = '';
-      dependencies.value = [];
-      dialog.value = false;
-    }
+function getVersionString(vers) {
+  let baseString = `Library version: ${vers.version}`;
+  if (vers.dependencies.length > 0) {
+    baseString += `, Dependencies: ${vers.dependencies.map((dep) => `${dep.name} - ${dep.version}`).join(', ')}`;
   }
-
-  function editVersion(editVersion, index) {
-    isEdit.value = true;
-    editIndex = index;
-    version.value = editVersion.version;
-    dependencies.value = [...editVersion.dependencies];
-    dialog.value = true;
-  }
-
-  function removeVersion(index) {
-    versions.value.splice(index, 1);
-  }
-
-  function getVersionString(vers) {
-    let baseString = `Library version: ${vers.version}`;
-    if (vers.dependencies.length > 0) {
-      baseString += `, Dependencies: ${vers.dependencies.map((dep) => `${dep.name} - ${dep.version}`).join(', ')}`;
-    }
-    return baseString;
-  }
+  return baseString;
+}
 </script>
 
 <style lang="sass" scoped>
 .versions
   &__item
-    margin-bottom: 16px 
+    margin-bottom: 16px
 </style>

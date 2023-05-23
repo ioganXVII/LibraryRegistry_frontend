@@ -3,24 +3,24 @@
     <v-app-bar>
       <template v-slot:prepend>
         <v-menu>
-            <template v-slot:activator="{ props }">
-              <v-btn icon="mdi-dots-vertical" v-bind="props"></v-btn>
-            </template>
+          <template v-slot:activator="{ props }">
+            <v-btn icon="mdi-dots-vertical" v-bind="props" />
+          </template>
 
-            <v-list>
-              <v-list-item
-                v-for="item in links"
-                :key="item.caption"
+          <v-list>
+            <v-list-item
+              v-for="item in links"
+              :key="item.caption"
+            >
+              <RouterLink
+                class="header__link"
+                :to="item.link"
               >
-                <RouterLink
-                  class="header__link"
-                  :to="item.link"
-                >
-                  {{ item.caption }}
-                </RouterLink>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+                {{ item.caption }}
+              </RouterLink>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
       <template #append>
         <v-btn
@@ -34,13 +34,14 @@
     <v-main
       class="page__wrapper"
     >
-      <router-view/>
+      <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router';
+
 const router = useRouter();
 
 const links = [
@@ -51,7 +52,7 @@ const links = [
   {
     caption: 'Log',
     link: '/log',
-  }
+  },
 ];
 
 function create() {

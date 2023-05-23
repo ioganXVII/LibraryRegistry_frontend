@@ -1,8 +1,8 @@
 <template>
   <v-list>
     <v-list-item
-      v-for="(item, index) in logs"
-      :key="index"
+      v-for="item in logs"
+      :key="item.action"
       :title="item.action"
       :subtitle="getDate(item.create_time)"
     />
@@ -11,8 +11,8 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { useLogsStore } from '../../../stores/log';
 import { onMounted } from 'vue';
+import { useLogsStore } from '../../../stores/log';
 
 const store = useLogsStore();
 
@@ -20,12 +20,12 @@ const { logs } = storeToRefs(store);
 
 const { getLogs } = store;
 
-onMounted(async () => await getLogs());
+onMounted(async () => getLogs());
 
 function getDate(date) {
   const newDate = new Date(date).toLocaleString();
   return newDate;
-};
+}
 
 </script>
 

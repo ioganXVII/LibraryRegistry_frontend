@@ -9,12 +9,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'registry',
-      component: LibraryRegistry
+      component: LibraryRegistry,
     },
     {
       path: '/create',
       name: 'create',
-      component: CreateLibraryPage
+      component: CreateLibraryPage,
     },
     {
       path: '/edit/:name',
@@ -24,9 +24,9 @@ const router = createRouter({
     {
       path: '/log',
       name: 'log',
-      component: LogPage
+      component: LogPage,
     },
-  ]
-})
+  ],
+});
 
-export default router
+export default router;

@@ -1,8 +1,8 @@
 <template>
   <v-container>
     <v-card
-      v-for="(item, index) in libraries"
-      :key="index"
+      v-for="item in libraries"
+      :key="item.name"
       class="mb-2 pa-2"
     >
       <v-card-title>{{ item.name }}</v-card-title>
@@ -11,8 +11,8 @@
           class="registry__item"
         >
           <v-card
-            v-for="(version, versionIndex) in item.versions"
-            :key="versionIndex"
+            v-for="version in item.versions"
+            :key="`version-${version.version}`"
             class="registry__version mr-2"
             variant="tonal"
           >
@@ -27,8 +27,8 @@
                   Dependencies:
                 </div>
                 <v-chip
-                  v-for="(dependencie, dependencieIndex) in version.dependencies"
-                  :key="dependencieIndex"
+                  v-for="dependencie in version.dependencies"
+                  :key="dependencie.name"
                   label
                   class="mr-2"
                 >
@@ -75,14 +75,12 @@ async function deleteLib(id) {
 
 onMounted(async () => {
   await getLibraries();
-})
-
+});
 
 function editLib(item) {
   router.push({ name: 'edit', params: { name: item.name } });
 }
 </script>
-
 
 <style lang="sass" scoped>
 .registry

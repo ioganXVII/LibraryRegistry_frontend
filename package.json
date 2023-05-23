@@ -5,13 +5,14 @@
   "scripts": {
     "serve": "vite preview",
     "build": "vite build",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore",
     "dev": "vite",
     "format": "prettier --write src/",
     "preview": "vite preview"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "@vue/eslint-config-airbnb": "^7.0.0",
     "axios": "^1.4.0",
     "pinia": "^2.0.36",
     "roboto-fontface": "*",

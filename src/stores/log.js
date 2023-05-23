@@ -1,7 +1,8 @@
-import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import axios from 'axios'
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
+import axios from 'axios';
 
+// eslint-disable-next-line import/prefer-default-export
 export const useLogsStore = defineStore('logsRegistry', () => {
   const logs = ref([]);
 
@@ -10,6 +11,5 @@ export const useLogsStore = defineStore('logsRegistry', () => {
     logs.value = data;
   }
 
-  
   return { logs, getLogs };
-})
+});
