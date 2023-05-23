@@ -26,8 +26,4 @@ function getDate(date) {
   const newDate = new Date(date).toLocaleString();
   return newDate;
 }
-
 </script>
-
-<style lang="sass" scoped>
-</style>

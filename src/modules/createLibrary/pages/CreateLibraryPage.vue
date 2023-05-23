@@ -82,6 +82,3 @@ function clearName() {
   name.value = '';
 }
 </script>
-
-<style lang="sass" scoped>
-</style>

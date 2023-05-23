@@ -1,6 +1,6 @@
 import { ref, unref } from 'vue';
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import axios from '../utils/axios';
 
 // eslint-disable-next-line import/prefer-default-export
 export const useCreateLibraryStore = defineStore('createLibrary', () => {
@@ -16,7 +16,7 @@ export const useCreateLibraryStore = defineStore('createLibrary', () => {
   });
 
   async function getLibraries(isEdit, libName) {
-    let { data } = await axios.get('http://localhost:3000/api/getLibraries');
+    let { data } = await axios.get('/getLibraries');
     if (isEdit) {
       data = data.filter((item) => item.name !== libName);
     }
@@ -31,19 +31,19 @@ export const useCreateLibraryStore = defineStore('createLibrary', () => {
   }
 
   async function getLibrary(libName) {
-    const { data } = await axios.get(`http://localhost:3000/api/getLibrary/${libName}`);
+    const { data } = await axios.get(`/getLibrary/${libName}`);
     name.value = data.name;
     versions.value = data.versions;
   }
 
   async function createLibrary() {
-    await axios.post('http://localhost:3000/api/createLibrary', {
+    await axios.post('/createLibrary', {
       name: unref(name), versions: unref(versions),
     });
   }
 
   async function editLibrary() {
-    await axios.post('http://localhost:3000/api/editLibrary', {
+    await axios.post('/editLibrary', {
       name: unref(name), versions: unref(versions),
     });
   }
