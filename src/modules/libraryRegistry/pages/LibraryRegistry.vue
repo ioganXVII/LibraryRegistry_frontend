@@ -52,19 +52,25 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+    <v-pagination
+      v-model="page"
+      :length="librariesLength"
+      @update:modelValue="changePage"
+    />
   </v-container>
 </template>
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { onMounted, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useLibrariesStore } from '../../../stores/libraries';
 
 const store = useLibrariesStore();
 const router = useRouter();
+const route = useRoute();
 
-const { libraries } = storeToRefs(store);
+const { libraries, page, librariesLength } = storeToRefs(store);
 
 const { getLibraries, deleteLibrary } = store;
 
@@ -73,13 +79,30 @@ async function deleteLib(id) {
   await getLibraries();
 }
 
+async function changePage() {
+  router.push(`${route.path}?page=${page.value}`);
+  await getLibraries();
+}
+
 onMounted(async () => {
+  const pageVal = parseInt(route.query.page, 10) > 0
+    ? parseInt(route.query.page, 10) : false;
+  if (!pageVal) {
+    router.push(`${route.path}?page=1`);
+  } else {
+    page.value = pageVal;
+  }
   await getLibraries();
 });
 
 function editLib(item) {
   router.push({ name: 'edit', params: { name: item.name } });
 }
+
+onUnmounted(() => {
+  page.value = 1;
+  librariesLength.value = 1;
+});
 </script>
 
 <style lang="sass" scoped>
