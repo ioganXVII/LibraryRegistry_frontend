@@ -16,7 +16,8 @@ export const useCreateLibraryStore = defineStore('createLibrary', () => {
   });
 
   async function getLibraries(isEdit, libName) {
-    let { data } = await axios.get('/getLibraries');
+    let { data } = await axios.get('/getLibraries?getAll=true');
+    data = data.data;
     if (isEdit) {
       data = data.filter((item) => item.name !== libName);
     }

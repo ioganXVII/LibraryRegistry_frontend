@@ -31,7 +31,7 @@
                     v-for="dependencie in version.dependencies"
                     :key="dependencie.name"
                     label
-                    class="mr-2"
+                    class="mr-2 mb-2"
                   >
                     {{ `${dependencie.name} - ${dependencie.version}` }}
                   </v-chip>
