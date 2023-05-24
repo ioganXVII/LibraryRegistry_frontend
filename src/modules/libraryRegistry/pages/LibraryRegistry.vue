@@ -1,62 +1,70 @@
 <template>
   <v-container>
-    <v-card
-      v-for="item in libraries"
-      :key="item.name"
-      class="mb-2 pa-2"
-    >
-      <v-card-title>{{ item.name }}</v-card-title>
-      <v-card-text>
-        <div
-          class="registry__item"
-        >
-          <v-card
-            v-for="version in item.versions"
-            :key="`version-${version.version}`"
-            class="registry__version mr-2"
-            variant="tonal"
+    <template v-if="libraries.length > 0">
+      <v-card
+        v-for="item in libraries"
+        :key="item.name"
+        class="mb-2 pa-2"
+      >
+        <v-card-title>{{ item.name }}</v-card-title>
+        <v-card-text>
+          <div
+            class="registry__item"
           >
-            <v-card-text>
-              <div>
-                {{ version.version }}
-              </div>
-              <div
-                v-if="version.dependencies.length > 0"
-              >
+            <v-card
+              v-for="version in item.versions"
+              :key="`version-${version.version}`"
+              class="registry__version mr-2"
+              variant="tonal"
+            >
+              <v-card-text>
                 <div>
-                  Dependencies:
+                  {{ version.version }}
                 </div>
-                <v-chip
-                  v-for="dependencie in version.dependencies"
-                  :key="dependencie.name"
-                  label
-                  class="mr-2"
+                <div
+                  v-if="version.dependencies.length > 0"
                 >
-                  {{ `${dependencie.name} - ${dependencie.version}` }}
-                </v-chip>
-              </div>
-            </v-card-text>
-          </v-card>
-        </div>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn
-          @click="editLib(item)"
-        >
-          Edit library
-        </v-btn>
-        <v-btn
-          @click="deleteLib(item.id)"
-        >
-          Delete library
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-    <v-pagination
-      v-model="page"
-      :length="librariesLength"
-      @update:modelValue="changePage"
-    />
+                  <div>
+                    Dependencies:
+                  </div>
+                  <v-chip
+                    v-for="dependencie in version.dependencies"
+                    :key="dependencie.name"
+                    label
+                    class="mr-2"
+                  >
+                    {{ `${dependencie.name} - ${dependencie.version}` }}
+                  </v-chip>
+                </div>
+              </v-card-text>
+            </v-card>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            @click="editLib(item)"
+          >
+            Edit library
+          </v-btn>
+          <v-btn
+            @click="deleteLib(item.id)"
+          >
+            Delete library
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-pagination
+        v-model="page"
+        :length="librariesLength"
+        @update:modelValue="changePage"
+      />
+    </template>
+    <div
+      v-else
+      class="d-flex justify-center"
+    >
+      Libraries is empty! You can add new
+    </div>
   </v-container>
 </template>
 

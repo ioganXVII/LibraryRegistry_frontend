@@ -1,18 +1,28 @@
 <template>
   <v-container>
-    <v-list>
-      <v-list-item
-        v-for="item in logs"
-        :key="item.action"
-        :title="item.action"
-        :subtitle="getDate(item.create_time)"
+    <template
+      v-if="logs.length > 0"
+    >
+      <v-list>
+        <v-list-item
+          v-for="item in logs"
+          :key="item.action"
+          :title="item.action"
+          :subtitle="getDate(item.create_time)"
+        />
+      </v-list>
+      <v-pagination
+        v-model="page"
+        :length="logLength"
+        @update:modelValue="changePage"
       />
-    </v-list>
-    <v-pagination
-      v-model="page"
-      :length="logLength"
-      @update:modelValue="changePage"
-    />
+    </template>
+    <div
+      v-else
+      class="d-flex justify-center"
+    >
+      Log list is empty
+    </div>
   </v-container>
 </template>
 
