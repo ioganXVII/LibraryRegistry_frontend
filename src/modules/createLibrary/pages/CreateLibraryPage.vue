@@ -5,11 +5,14 @@
       label="Library name"
       :rules="[checkName]"
       counter="255"
+      :error="!formValid.name"
+      :error-messages="(!formValid.name && 'Name duplicated') || checkName()"
       :counter-value="getNameLength"
       clearable
       variant="outlined"
       :disabled="isEdit"
       @click:clear="clearName"
+      @update:modelValue="changeFormValid"
     />
     <div class="d-flex flex-column mt-4">
       <versionsSection />
@@ -42,7 +45,7 @@ const router = useRouter();
 const route = useRoute();
 const isEdit = computed(() => route.name === 'edit');
 
-const { name, versions } = storeToRefs(store);
+const { name, versions, formValid } = storeToRefs(store);
 
 const {
   getLibraries, getLibrary, createLibrary, editLibrary, clearState,
@@ -61,16 +64,8 @@ onBeforeRouteLeave((to, from, next) => {
 
 const getCreateBtnText = computed(() => (isEdit.value ? 'Edit library' : 'Create Library'));
 
-async function create() {
-  if (isEdit.value) {
-    await editLibrary();
-  } else {
-    await createLibrary();
-  }
-  router.push('/');
-}
-
-const checkCreate = computed(() => name.value.length <= 0 || versions.value.length <= 0);
+const checkCreate = computed(() => (name.value.length >= 255 || name.value.length <= 0)
+  && versions.value.length <= 0);
 
 const getNameLength = computed(() => name.value.length);
 
@@ -78,7 +73,24 @@ function checkName() {
   return getNameLength.value <= 255 || 'Too large name';
 }
 
+async function create() {
+  if (isEdit.value) {
+    await editLibrary();
+  } else {
+    await createLibrary();
+  }
+
+  if (formValid.value.name) {
+    router.push('/');
+  }
+}
+
+function changeFormValid() {
+  formValid.value.name = true;
+}
+
 function clearName() {
+  formValid.value.name = true;
   name.value = '';
 }
 </script>

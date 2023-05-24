@@ -25,10 +25,16 @@ export const useCreateLibraryStore = defineStore('createLibrary', () => {
   }
 
   function clearState() {
+    dialog.value = false;
     name.value = '';
     version.value = '';
     versions.value = [];
     dependencies.value = [];
+    libraries.value = [];
+    formValid.value = {
+      name: true,
+      version: true,
+    };
   }
 
   async function getLibrary(libName) {
@@ -40,6 +46,10 @@ export const useCreateLibraryStore = defineStore('createLibrary', () => {
   async function createLibrary() {
     await axios.post('/createLibrary', {
       name: unref(name), versions: unref(versions),
+    }).catch((err) => {
+      if (err.response.data.errCode === 'DUPLICATED') {
+        formValid.value.name = false;
+      }
     });
   }
 
